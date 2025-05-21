@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mesin Pencari Informasi Publik</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="header">
+        <h1>Mesin Pencari Informasi Publik</h1>
+    </div>
+    
+    <div class="search-section">
+        <div class="search-container">
+            <div class="search-wrapper">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" class="search-input" placeholder="Masukkan kata kunci pencarian..." aria-label="Kata kunci pencarian">
+            </div>
+            <button id="searchButton" class="search-button" onclick="doSearch()">
+                <i class="fas fa-search"></i>
+                Telusuri
+            </button>
+        </div>
+        
+        <div class="search-options">
+            <div class="results-count">
+                <label for="resultsPerPage">Tampilkan:</label>
+                <select id="resultsPerPage" onchange="updateResultsCount()">
+                    <option value="5">5 hasil</option>
+                    <option value="10" selected>10 hasil</option>
+                    <option value="20">20 hasil</option>
+                    <option value="50">50 hasil</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="loading-indicator" id="loadingIndicator">
+        <div class="spinner"></div>
+        <span>Mencari hasil...</span>
+    </div>
+
+    <div id="searchResults">
+        <h2><i class="fas fa-list-ul"></i> Hasil Pencarian</h2>
+        
+        <div class="search-metrics">
+            <i class="fas fa-clock"></i> <span id="searchTiming">Ditemukan dalam 0.35 detik</span>
+        </div>
+        
+        <div class="result-list" id="resultList">
+            <!-- Item hasil pencarian akan ditambahkan secara dinamis, ini contoh saja -->
+            <div class="result-item">
+                <div class="result-title">
+                    <a href="https://fpmipa.upi.edu/kurikulum">Kurikulum FPMIPA</a>
+                    <a href="#" class="view-route-button" onclick="toggleBreadcrumbs('kurikulum')">
+                        <i class="fas fa-route"></i> Lihat Rute Link
+                    </a>
+                </div>
+                <div class="result-url">
+                    <i class="fas fa-link"></i> https://fpmipa.upi.edu/kurikulum
+                </div>
+                <div class="result-description">
+                    Informasi mengenai kurikulum di Fakultas Pendidikan Matematika dan Ilmu Pengetahuan Alam. Halaman ini menyediakan detail tentang struktur kurikulum, mata kuliah, dan persyaratan untuk program studi di FPMIPA.
+                </div>
+                <div class="result-tags">
+                    <span class="result-tag">Akademik</span>
+                    <span class="result-tag">Kurikulum</span>
+                </div>
+            </div>
+            
+            <div class="result-item">
+                <div class="result-title">
+                    <a href="https://fpmipa.upi.edu/program-studi">Program Studi FPMIPA</a>
+                    <a href="#" class="view-route-button" onclick="toggleBreadcrumbs('program-studi')">
+                        <i class="fas fa-route"></i> Lihat Rute Link
+                    </a>
+                </div>
+                <div class="result-url">
+                    <i class="fas fa-link"></i> https://fpmipa.upi.edu/program-studi
+                </div>
+                <div class="result-description">
+                    Daftar lengkap program studi yang tersedia di FPMIPA UPI beserta informasi pendaftaran, persyaratan masuk, dan prospek karir untuk setiap program studi.
+                </div>
+                <div class="result-tags">
+                    <span class="result-tag">Akademik</span>
+                    <span class="result-tag">Program Studi</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pagination" id="pagination">
+            <button class="pagination-button">
+                <i class="fas fa-angle-double-left"></i>
+            </button>
+            <button class="pagination-button">
+                <i class="fas fa-angle-left"></i>
+            </button>
+            <button class="pagination-button active">1</button>
+            <button class="pagination-button">2</button>
+            <button class="pagination-button">3</button>
+            <button class="pagination-button">
+                <i class="fas fa-angle-right"></i>
+            </button>
+            <button class="pagination-button">
+                <i class="fas fa-angle-double-right"></i>
+            </button>
+        </div>
+
+        <div class="breadcrumbs" id="breadcrumbs-kurikulum">
+            <h3>
+                <i class="fas fa-route"></i>
+                Rute ke Halaman Kurikulum FPMIPA
+            </h3>
+            <ol>
+                <li><a href="https://www.upi.edu">UPI - Beranda</a> (https://www.upi.edu)</li>
+                <li><a href="https://fpmipa.upi.edu">FPMIPA</a> (https://fpmipa.upi.edu)</li>
+                <li><a href="https://fpmipa.upi.edu/kurikulum">Kurikulum FPMIPA</a> (https://fpmipa.upi.edu/kurikulum)</li>
+            </ol>
+        </div>
+        
+        <div class="breadcrumbs" id="breadcrumbs-program-studi">
+            <h3>
+                <i class="fas fa-route"></i>
+                Rute ke Halaman Program Studi FPMIPA
+            </h3>
+            <ol>
+                <li><a href="https://www.upi.edu">UPI - Beranda</a> (https://www.upi.edu)</li>
+                <li><a href="https://fpmipa.upi.edu">FPMIPA</a> (https://fpmipa.upi.edu)</li>
+                <li><a href="https://fpmipa.upi.edu/program-studi">Program Studi FPMIPA</a> (https://fpmipa.upi.edu/program-studi)</li>
+            </ol>
+        </div>
+
+        <div class="seed-url">
+            <i class="fas fa-seedling"></i> Seed URL: <a href="https://www.upi.edu">https://www.upi.edu</a>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
