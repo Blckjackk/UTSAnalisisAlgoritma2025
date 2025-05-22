@@ -139,5 +139,76 @@ if (!empty($query)) {
     </div>
 
     <script src="script.js"></script>
+    <script>
+    // Fungsi untuk melakukan pencarian
+    async function doSearch() {
+        const searchTerm = document.getElementById('searchInput').value;
+        const resultsPerPage = document.getElementById('resultsPerPage').value;
+
+        if (searchTerm.trim() === '') {
+            alert('Masukkan kata kunci pencarian!');
+            return;
+        }
+
+        // Tampilkan loading
+        document.getElementById('loadingIndicator').style.display = 'flex';
+        document.getElementById('searchResults').style.opacity = '0.5';
+
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/search?query=${encodeURIComponent(searchTerm)}&limit=${resultsPerPage}`);
+            const results = await response.json();
+
+            const resultList = document.getElementById('resultList');
+            resultList.innerHTML = '';
+
+            if (results.length === 0) {
+                resultList.innerHTML = '<p>Tidak ada hasil ditemukan.</p>';
+            } else {
+                results.forEach(result => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+
+                    resultItem.innerHTML = `
+                        <div class="result-title">
+                            <a href="${result.url}" target="_blank">${result.title}</a>
+                        </div>
+                        <div class="result-url">${result.url}</div>
+                        <div class="result-description">${result.description}</div>
+                        <button class="view-route-button" onclick="viewBreadcrumb(${result.pageId})">Lihat Rute Link</button>
+                    `;
+
+                    resultList.appendChild(resultItem);
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching search results:', error);
+        } finally {
+            document.getElementById('loadingIndicator').style.display = 'none';
+            document.getElementById('searchResults').style.opacity = '1';
+        }
+    }
+
+    // Fungsi untuk melihat breadcrumb
+    async function viewBreadcrumb(pageId) {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/breadcrumbs/${pageId}`);
+            const breadcrumbs = await response.json();
+
+            const breadcrumbList = document.createElement('ol');
+            breadcrumbs.forEach(crumb => {
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `<a href="${crumb.url}" target="_blank">${crumb.title}</a>`;
+                breadcrumbList.appendChild(listItem);
+            });
+
+            const breadcrumbContainer = document.getElementById('breadcrumbs-kurikulum');
+            breadcrumbContainer.innerHTML = '';
+            breadcrumbContainer.appendChild(breadcrumbList);
+            breadcrumbContainer.style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching breadcrumbs:', error);
+        }
+    }
+    </script>
 </body>
 </html>

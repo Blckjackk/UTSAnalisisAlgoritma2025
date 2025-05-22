@@ -20,10 +20,10 @@ def search_database(query, limit):
             SELECT pages.id, pages.url, pages.title, pages.content, SUM(word_counts.count) as total
             FROM word_counts
             JOIN pages ON pages.id = word_counts.page_id
-            WHERE word_counts.word = ?
+            WHERE word_counts.word = %s
             GROUP BY pages.id
             ORDER BY total DESC
-            LIMIT ?
+            LIMIT %s
         ''', (word, limit))
 
         for row in c.fetchall():
@@ -56,7 +56,7 @@ def get_breadcrumbs(page_id):
 
     while current_page_id:
         c.execute('''
-            SELECT url, title FROM pages WHERE id = ?
+            SELECT url, title FROM pages WHERE id = %s
         ''', (current_page_id,))
         row = c.fetchone()
 
@@ -68,7 +68,7 @@ def get_breadcrumbs(page_id):
 
         # Cari halaman sebelumnya (jika ada)
         c.execute('''
-            SELECT page_id FROM word_counts WHERE word = ? LIMIT 1
+            SELECT page_id FROM word_counts WHERE word = %s LIMIT 1
         ''', (url,))
         parent_row = c.fetchone()
         current_page_id = parent_row[0] if parent_row else None
