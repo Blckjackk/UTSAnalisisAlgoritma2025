@@ -1,15 +1,15 @@
-from flask import Flask, request, jsonify
 import mysql.connector
 
-app = Flask(__name__)
-
-def search_database(query, limit):
-    conn = mysql.connector.connect(
+def get_db_connection():
+    return mysql.connector.connect(
         host="localhost",
-        user="root",  # Ganti dengan username MySQL Anda
-        password="",  # Ganti dengan password MySQL Anda
+        user="root",
+        password="",
         database="db_andal"
     )
+
+def search_database(query, limit):
+    conn = get_db_connection()
     c = conn.cursor()
 
     query_words = query.lower().split()
@@ -43,12 +43,7 @@ def search_database(query, limit):
     return sorted(results.values(), key=lambda x: x['score'], reverse=True)
 
 def get_breadcrumbs(page_id):
-    conn = mysql.connector.connect(
-        host="localhost",
-        user="root",  # Ganti dengan username MySQL Anda
-        password="",  # Ganti dengan password MySQL Anda
-        database="db_andal"
-    )
+    conn = get_db_connection()
     c = conn.cursor()
 
     breadcrumbs = []
@@ -66,31 +61,11 @@ def get_breadcrumbs(page_id):
         url, title = row
         breadcrumbs.append({'url': url, 'title': title})
 
-        # Cari halaman sebelumnya (jika ada)
         c.execute('''
-            SELECT page_id FROM word_counts WHERE word = %s LIMIT 1
-        ''', (url,))
+            SELECT from_page_id FROM links WHERE to_page_id = %s LIMIT 1
+        ''', (current_page_id,))
         parent_row = c.fetchone()
         current_page_id = parent_row[0] if parent_row else None
 
     conn.close()
-    return breadcrumbs[::-1]  # Balikkan urutan untuk menampilkan dari root ke halaman hasil
-
-@app.route('/search', methods=['GET'])
-def search():
-    query = request.args.get('query', '')
-    limit = int(request.args.get('limit', 10))
-
-    if not query:
-        return jsonify([])
-
-    results = search_database(query, limit)
-    return jsonify(results)
-
-@app.route('/breadcrumbs/<int:page_id>', methods=['GET'])
-def breadcrumbs(page_id):
-    breadcrumbs = get_breadcrumbs(page_id)
-    return jsonify(breadcrumbs)
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return breadcrumbs[::-1]
